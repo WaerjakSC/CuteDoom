@@ -3,16 +3,19 @@
 
 #include "CuteGameplayHUD.h"
 
-void UCuteGameplayHUD::NativeConstruct() {
+void UCuteGameplayHUD::NativeConstruct()
+{
 	Super::NativeConstruct();
-	if (crosshairImage) {
-		crosshairImage->SetBrushFromTexture(crosshairTex);
+	if (CrosshairImage)
+	{
+		CrosshairImage->SetBrushFromTexture(CrosshairTex);
 	}
 }
 
 void UCuteGameplayHUD::SynchronizeProperties()
 {
-	if (crosshairImage) {
-		crosshairImage->SetBrushFromTexture(crosshairTex, true);
+	if (CrosshairImage)
+	{
+		CrosshairImage->SetBrushFromTexture(CrosshairTex, true);
 	}
 }

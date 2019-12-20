@@ -9,35 +9,35 @@
 // Sets default values
 AEnemyBase::AEnemyBase()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	collider = GetCapsuleComponent();
-	collider->InitCapsuleSize(36.f, 130.f);
+	Collider = GetCapsuleComponent();
+	Collider->InitCapsuleSize(36.f, 130.f);
 
-	enemyMesh = GetMesh();
-	bloodGush = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Blood Hit-PFX"));
-	bloodGush->SetupAttachment(RootComponent);
-	bloodGush->SetAutoActivate(false);
+	EnemyMesh = GetMesh();
+	BloodGush = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Blood Hit-PFX"));
+	BloodGush->SetupAttachment(RootComponent);
+	BloodGush->SetAutoActivate(false);
 
-	gibs = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("GIBS"));
-	gibs->SetupAttachment(RootComponent);
-	gibs->SetAutoActivate(false);
+	Gibs = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("GIBS"));
+	Gibs->SetupAttachment(RootComponent);
+	Gibs->SetAutoActivate(false);
 
-	enemyMesh->SetCollisionProfileName(TEXT("Ragdoll"));
-	enemyMesh->SetCollisionObjectType(ECC_PhysicsBody);
-	//enemyMesh->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
-	enemyMesh->SetEnableGravity(true);
-	enemyMesh->SetSimulatePhysics(false);
+	EnemyMesh->SetCollisionProfileName(TEXT("Ragdoll"));
+	EnemyMesh->SetCollisionObjectType(ECC_PhysicsBody);
+	//EnemyMesh->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	EnemyMesh->SetEnableGravity(true);
+	EnemyMesh->SetSimulatePhysics(false);
 
-	movement = GetCharacterMovement();
+	Movement = GetCharacterMovement();
 }
 
 // Called when the game starts or when spawned
 void AEnemyBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 }
 
 // Called every frame
@@ -54,51 +54,51 @@ void AEnemyBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 
 }
 
-void AEnemyBase::hitEvent(float damage, float forceScaling)
+void AEnemyBase::HitEvent(float Damage, float ForceScaling)
 {
-	if (health > 0) {
-		health -= damage;
-		bloodGush->ActivateSystem();
+	if (Health > 0) {
+		Health -= Damage;
+		BloodGush->ActivateSystem();
 	}
-	if (isDead) // shoot as many times as you like to spawn as many gibs as you like I guess, should be funny
+	if (bIsDead) // shoot as many times as you like to spawn as many gibs as you like I guess, should be funny
 	{
-		gibs->ActivateSystem();
-		enemyMesh->DestroyComponent();
-		destroyFace();
+		Gibs->ActivateSystem();
+		EnemyMesh->DestroyComponent();
+		DestroyFace();
 
 	}
-	if (health <= 0.f && !isDead)
+	if (Health <= 0.f && !bIsDead)
 	{
-		isDead = true;
+		bIsDead = true;
 		// Disable all collision on capsule
 		//collider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		//collider->SetCollisionResponseToAllChannels(ECR_Ignore);
 		if (!bIsRagdoll) {
-			collider->DestroyComponent();
-			enemyMesh->SetAllBodiesSimulatePhysics(true); // Start simulating physics to active ragdoll mode.
-			enemyMesh->SetSimulatePhysics(true);
-			enemyMesh->WakeAllRigidBodies();
-			enemyMesh->bBlendPhysics = true;
+			Collider->DestroyComponent();
+			EnemyMesh->SetAllBodiesSimulatePhysics(true); // Start simulating physics to active ragdoll mode.
+			EnemyMesh->SetSimulatePhysics(true);
+			EnemyMesh->WakeAllRigidBodies();
+			EnemyMesh->bBlendPhysics = true;
 
-			movement->StopMovementImmediately();
-			movement->DisableMovement();
-			movement->SetComponentTickEnabled(false);
+			Movement->StopMovementImmediately();
+			Movement->DisableMovement();
+			Movement->SetComponentTickEnabled(false);
 
 			bIsRagdoll = true;
-			enemyMesh->SetAllPhysicsLinearVelocity(FVector(0));
+			EnemyMesh->SetAllPhysicsLinearVelocity(FVector(0));
 
 		}
 
 
 		// Apply force from the attack.
 		FVector lineFromPlayer = -GetActorRightVector();
-		lineFromPlayer *= forceScaling;
+		lineFromPlayer *= ForceScaling;
 		lineFromPlayer.Z *= 1.4f; // Add some extra force in the Z direction to simulate the "flying backwards and up" trope in movies when people get shot
-		enemyMesh->AddImpulse(lineFromPlayer); // Head is still too heavy so this kinda doesn't work too well atm
-		spawnMeat();
+		EnemyMesh->AddImpulse(lineFromPlayer); // Head is still too heavy so this kinda doesn't work too well atm
+		SpawnMeat();
 	}
 }
-void AEnemyBase::spawnMeat()
+void AEnemyBase::SpawnMeat()
 {
 	if (Meat)
 	{
@@ -110,7 +110,7 @@ void AEnemyBase::spawnMeat()
 
 			FRotator rotator;
 
-			FVector spawnLocation = this->enemyMesh->GetComponentLocation();
+			FVector spawnLocation = this->EnemyMesh->GetComponentLocation();
 			FVector increaseZ(0, 0, 2);
 			spawnLocation = spawnLocation + increaseZ;
 			world->SpawnActor<AActor>(Meat, spawnLocation, rotator, spawnParams);

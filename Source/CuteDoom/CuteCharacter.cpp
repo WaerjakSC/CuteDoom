@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "CuteCharacter.h"
-#include "GameFramework\CharacterMovementComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/SkeletalMeshComponent.h"
@@ -19,7 +19,7 @@ ACuteCharacter::ACuteCharacter()
 
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(55.f, 96.0f);
-	// set our turn rates for inputhttps://discordapp.com/channels/180752649031778305/545292570268532748
+	// set our turn rates for input
 	BaseTurnRate = 45.f;
 	BaseLookUpRate = 45.f;
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
@@ -41,7 +41,7 @@ ACuteCharacter::ACuteCharacter()
 
 	// Create a gun mesh component
 	FPGun = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("FPGun"));
-	FPGun->SetOnlyOwnerSee(true);			// only the owning player will see this mesh
+	FPGun->SetOnlyOwnerSee(true); // only the owning player will see this mesh
 	FPGun->bCastDynamicShadow = false;
 	FPGun->CastShadow = false;
 	FPGun->SetupAttachment(ArmsMesh, TEXT("GripPoint"));
@@ -59,11 +59,11 @@ void ACuteCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	//Attach gun mesh component to Skeleton, doing it here because the skeleton is not yet created in the constructor
-	FPGun->AttachToComponent(ArmsMesh, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint"));
+	FPGun->AttachToComponent(ArmsMesh, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true),
+	                         TEXT("GripPoint"));
 	// Set the Kick WeaponStats UObject from the given blueprint
-	KickWP = NewObject<UWeaponStats>(this, KickBP->GetFName(), RF_NoFlags, KickBP.GetDefaultObject());
-	SetWeapon(currentWeapon);
-
+	KickWeapon = NewObject<UWeaponStats>(this, KickBP->GetFName(), RF_NoFlags, KickBP.GetDefaultObject());
+	SetWeapon(CurrentWeapon);
 }
 
 // Called every frame
@@ -102,13 +102,15 @@ void ACuteCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("LookUpRate", this, &ACuteCharacter::LookUpAtRate);
 }
+
 void ACuteCharacter::Shoot()
 {
 	FHitResult TraceResult(ForceInit);
 	FCollisionQueryParams RV_TraceParams =
 		FCollisionQueryParams(FName(TEXT("RV_Trace")), true, this);
 
-	if (DoTrace(&TraceResult, &RV_TraceParams, curWeapon->GetRange())) {
+	if (DoTrace(&TraceResult, &RV_TraceParams, CurWeapon->GetRange()))
+	{
 		AActor* DamagedActor = TraceResult.GetActor();
 
 		UPrimitiveComponent* DamagedComponent = TraceResult.GetComponent();
@@ -123,8 +125,8 @@ void ACuteCharacter::Shoot()
 
 		// If we hit an actor
 		if ((DamagedActor != nullptr) && (DamagedActor != this) &&
-			(DamagedComponent != nullptr)) {
-
+			(DamagedComponent != nullptr))
+		{
 			// NOTE: Get equipped gun -> damage here
 			// if (AEnemyBase* enemy = Cast<AEnemyBase>(DamagedActor))
 			// with a component that is simulating physics, apply an impulse
@@ -139,7 +141,8 @@ void ACuteCharacter::Kick()
 	FCollisionQueryParams RV_TraceParams =
 		FCollisionQueryParams(FName(TEXT("RV_Trace")), true, this);
 
-	if (DoTrace(&TraceResult, &RV_TraceParams, KickWP->GetRange())) {
+	if (DoTrace(&TraceResult, &RV_TraceParams, KickWeapon->GetRange()))
+	{
 		AActor* DamagedActor = TraceResult.GetActor();
 
 		UPrimitiveComponent* DamagedComponent = TraceResult.GetComponent();
@@ -154,33 +157,41 @@ void ACuteCharacter::Kick()
 
 		// If we hit an actor
 		if ((DamagedActor != nullptr) && (DamagedActor != this) &&
-			(DamagedComponent != nullptr)) {
+			(DamagedComponent != nullptr))
+		{
 			// with a component that is simulating physics, apply an impulse
 			// if (AEnemyBase* enemy = Cast<AEnemyBase>(DamagedActor))
 			//  enemy->hitEvent(50.f, 40000.f);
 		}
 	}
 }
-void ACuteCharacter::Interact() 
+
+void ACuteCharacter::Interact()
 {
 	TArray<AActor*> overlappingActors;
 	GetOverlappingActors(overlappingActors);
-	for (auto actor : overlappingActors) {
-		if (actor->Implements<UInteractable>()) { // Check if the actor implements our Interactable interface
+	for (auto actor : overlappingActors)
+	{
+		if (actor->Implements<UInteractable>())
+		{
+			// Check if the actor implements our Interactable interface
 			// It does, so we execute the activate function. This may be a different function based on the actor.
-			IInteractable::Execute_Activate(actor); // Actor should always be the first variable, after which you can add any extra parameters the function asks for.
+			IInteractable::Execute_Activate(actor);
+			// Actor should always be the first variable, after which you can add any extra parameters the function asks for.
 		}
 	}
 }
-void ACuteCharacter::SetWeapon(ESelectedWeapon newWeapon)
+
+void ACuteCharacter::SetWeapon(ESelectedWeapon NewWeapon)
 {
-	currentWeapon = newWeapon;
-	switch (currentWeapon) {
+	CurrentWeapon = NewWeapon;
+	switch (CurrentWeapon)
+	{
 	case ESelectedWeapon::Pistol:
-		curWeapon = NewObject<UWeaponStats>(this, PistolBP->GetFName(), RF_NoFlags, PistolBP.GetDefaultObject());
+		CurWeapon = NewObject<UWeaponStats>(this, PistolBP->GetFName(), RF_NoFlags, PistolBP.GetDefaultObject());
 		break;
 	case ESelectedWeapon::Shotgun:
-		curWeapon = NewObject<UWeaponStats>(this, ShotgunBP->GetFName(), RF_NoFlags, ShotgunBP.GetDefaultObject());
+		CurWeapon = NewObject<UWeaponStats>(this, ShotgunBP->GetFName(), RF_NoFlags, ShotgunBP.GetDefaultObject());
 		break;
 	default:
 		break;
@@ -188,9 +199,9 @@ void ACuteCharacter::SetWeapon(ESelectedWeapon newWeapon)
 }
 
 bool ACuteCharacter::DoTrace(FHitResult* RV_Hit,
-	FCollisionQueryParams* RV_TraceParams, const float traceRange)
+                             FCollisionQueryParams* RV_TraceParams, const float TraceRange)
 {
-	if (Controller == NULL) // access the controller, make sure we have one
+	if (Controller == nullptr) // access the controller, make sure we have one
 	{
 		return false;
 	}
@@ -201,32 +212,35 @@ bool ACuteCharacter::DoTrace(FHitResult* RV_Hit,
 	GetActorEyesViewPoint(CameraLoc, CameraRot);
 
 	FVector Start = CameraLoc;
-	FVector End = CameraLoc + (CameraRot.Vector() * traceRange);
+	FVector End = CameraLoc + (CameraRot.Vector() * TraceRange);
 
 	RV_TraceParams->bTraceComplex = true;
 	RV_TraceParams->bReturnPhysicalMaterial = true;
 
 	//  do the line trace
 	bool DidTrace = GetWorld()->LineTraceSingleByChannel(
-		*RV_Hit,  // result
-		Start,    // start
-		End,      // end
+		*RV_Hit, // result
+		Start, // start
+		End, // end
 		ECC_Pawn, // collision channel -- Set this to something else
 		*RV_TraceParams);
-	if (!RV_Hit->IsValidBlockingHit()) {
+	if (!RV_Hit->IsValidBlockingHit())
+	{
 		DidTrace = GetWorld()->LineTraceSingleByChannel(
-			*RV_Hit,         // result
-			Start,           // start
-			End,             // end
+			*RV_Hit, // result
+			Start, // start
+			End, // end
 			ECC_PhysicsBody, // collision channel -- Set this to something else
 			*RV_TraceParams);
 	}
 	Start.Z -= 40.f; // Start the debug line slightly behind the camera
-	if (DebugMode) {
+	if (DebugMode)
+	{
 		DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 1.f);
 	}
 	return DidTrace;
 }
+
 void ACuteCharacter::MoveForward(float Value)
 {
 	if (Value != 0.0f)

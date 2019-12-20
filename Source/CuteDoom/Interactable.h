@@ -7,13 +7,13 @@
 #include "Interactable.generated.h"
 
 /**
- * 
+ *
  */
 UINTERFACE(Blueprintable)
 class CUTEDOOM_API UInteractable : public UInterface
 {
 	GENERATED_BODY()
-	
+
 };
 
 class IInteractable

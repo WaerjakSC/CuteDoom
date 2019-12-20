@@ -17,6 +17,7 @@ enum class ESelectedWeapon : uint8
 	Shotgun,
 	Unknown
 };
+
 UCLASS()
 class CUTEDOOM_API ACuteCharacter : public ACharacter
 {
@@ -29,62 +30,61 @@ public:
 	/** Returns Mesh1P subobject **/
 	FORCEINLINE class USkeletalMeshComponent* GetArmsMesh() const { return ArmsMesh; }
 	/** Returns FirstPersonCameraComponent subobject **/
-	FORCEINLINE class UCameraComponent* GetFirstPersonCameraComponent() const
-	{
-		return FirstPersonCameraComponent;
-	}
+	FORCEINLINE class UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
+
 	/** Fires a projectile. */
 	void Shoot();
+
 	/** Kick event */
 	void Kick();
+
 	/** Interaction event */
 	void Interact();
 
 	UFUNCTION(BlueprintCallable)
-		void SetWeapon(ESelectedWeapon newWeapon);
+
+	void SetWeapon(ESelectedWeapon NewWeapon);
 	// Character health.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PlayerCharacter)
-		float MaxHealth{ 100 };
+	float MaxHealth{100};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PlayerCharacter)
-		float Health{ 100 };
+	float Health{100};
 	// Total boost from eating meat.
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Meat)
-		float MeatBoost{ 0.f };
-	// Number of meat pieces to next boost.
+	float MeatBoost{0.f}; // Number of meat pieces to next boost.
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Meat)
-		int ToNextBoost { 10 };
+	int ToNextBoost{10};
 	// Total amount of meat pieces eaten.
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Meat)
-		float MeatsEaten{ 100 };
+	float MeatsEaten{100};
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Debug)
-		bool DebugMode{ false };
+	bool DebugMode{false};
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
-		float BaseTurnRate;
+	float BaseTurnRate;
 	/** Base look up/down rate, in deg/sec. Other scaling may affect final rate.   */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
-		float BaseLookUpRate;
+	float BaseLookUpRate;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon)
-		ESelectedWeapon currentWeapon {
-		ESelectedWeapon::Pistol
-	};
+	ESelectedWeapon CurrentWeapon{ESelectedWeapon::Pistol};
 	/** Gun muzzle's offset from the characters location */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
-		FVector GunOffset;
+	FVector GunOffset;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
-		TSubclassOf<UWeaponStats> PistolBP;
+	TSubclassOf<UWeaponStats> PistolBP;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
-		TSubclassOf<UWeaponStats> ShotgunBP;
+	TSubclassOf<UWeaponStats> ShotgunBP;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
-		TSubclassOf<UWeaponStats> KickBP;
+	TSubclassOf<UWeaponStats> KickBP;
 
 protected:
 	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+	void BeginPlay() override;
 
-	bool DoTrace(FHitResult* RV_Hit, FCollisionQueryParams* RV_TraceParams, const float traceRange);
+	bool DoTrace(FHitResult* RV_Hit, FCollisionQueryParams* RV_TraceParams, float TraceRange);
+
 	/** Handles moving forward/backward */
 	void MoveForward(float Val);
 
@@ -108,23 +108,30 @@ protected:
 private:
 	/** Pawn mesh: 1st person view (arms; seen only by self) */
 	UPROPERTY(EditDefaultsOnly, Category = Mesh)
-		class USkeletalMeshComponent* ArmsMesh;
+
+	class USkeletalMeshComponent* ArmsMesh;
 	/** Gun mesh: 1st person view (seen only by self) */
 	UPROPERTY(EditDefaultsOnly, Category = Mesh)
-		class USkeletalMeshComponent* FPGun;
+
+	class USkeletalMeshComponent* FPGun;
 
 	/** First person camera */
 	UPROPERTY(VisibleAnywhere,
 		BlueprintReadOnly,
 		Category = Camera,
 		meta = (AllowPrivateAccess = "true"))
-		class UCameraComponent* FirstPersonCameraComponent;
-	UWeaponStats* curWeapon, *KickWP;
+
+	class UCameraComponent* FirstPersonCameraComponent;
+
+	UPROPERTY()
+	UWeaponStats* CurWeapon{nullptr};
+	UPROPERTY()
+	UWeaponStats* KickWeapon{nullptr};
 public:
 	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	void Tick(float DeltaTime) override;
 
 	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(
+	void SetupPlayerInputComponent(
 		class UInputComponent* PlayerInputComponent) override;
 };

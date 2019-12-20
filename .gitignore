@@ -1,6 +1,9 @@
 # Visual Studio 2015 user specific files
 .vs/
 
+# CLion specific files
+.idea/
+
 # Compiled Object files
 *.slo
 *.lo
@@ -51,6 +54,8 @@ Plugins/*/Binaries/*
 
 # Builds
 Build/*
+cmake-build-debug/*
+cmake-build-release/*
 
 # Whitelist PakBlacklist-<BuildConfiguration>.txt files
 !Build/*/

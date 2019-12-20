@@ -22,9 +22,9 @@ public:
 	*/
 	virtual void SynchronizeProperties() override;
 
-	UPROPERTY(BlueprintReadWrite,meta = (BindWidget))
-		UImage* crosshairImage;
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+		UImage* CrosshairImage;
 
 	UPROPERTY(EditAnywhere)
-		UTexture2D* crosshairTex;
+		UTexture2D* CrosshairTex;
 };
