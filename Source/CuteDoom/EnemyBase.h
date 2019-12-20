@@ -17,42 +17,42 @@ public:
 	AEnemyBase();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Status)
-		float Health{ 100 };
+	float Health{100};
 
 	TSubclassOf<AActor> Meat;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = EnemyCharacter)
-		bool bIsDead{ false };
+	bool bIsDead{false};
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		bool bIsAttacking{ false };
+	bool bIsAttacking{false};
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-		float CurrentCooldown{ .12f };
+	float CurrentCooldown{.12f};
 	UPROPERTY(BlueprintReadOnly)
-		float AttackCooldown{ .18f };
+	float AttackCooldown{.18f};
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-		UParticleSystemComponent* BloodGush;
+	UParticleSystemComponent* BloodGush;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-		UParticleSystemComponent* Gibs;
+	UParticleSystemComponent* Gibs;
 	void HitEvent(float Damage, float ForceScaling);
 	UFUNCTION(BlueprintCallable)
-		void SpawnMeat();
+	void SpawnMeat();
 	UFUNCTION(BlueprintImplementableEvent)
-		void DestroyFace();
+	void DestroyFace();
 protected:
 	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+	void BeginPlay() override;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-		class USkeletalMeshComponent* EnemyMesh;
+	class USkeletalMeshComponent* EnemyMesh;
 	UPROPERTY(VisibleAnywhere)
-		class UCapsuleComponent* Collider;
+	class UCapsuleComponent* Collider;
 	UPROPERTY(VisibleAnywhere)
-		class UCharacterMovementComponent* Movement;
+	class UCharacterMovementComponent* Movement;
 public:
 	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	void Tick(float DeltaTime) override;
 
 	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 private:
-	bool bIsRagdoll{ false };
+	bool bIsRagdoll{false};
 };

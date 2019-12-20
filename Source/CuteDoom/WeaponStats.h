@@ -18,30 +18,46 @@ class CUTEDOOM_API UWeaponStats : public UObject
 public:
 
 	float GetRange() const { return Range; }
+
 	float GetDamage() const { return Damage; }
+
+	float GetForce() const { return ShotForce; }
+
+	int GetAmmo() const { return Ammo; }
+
+	int GetAmmoPerClip() const { return AmmoPerClip; }
+
+	float GetCooldown() const { return Cooldown; }
+
+	int GetShotsPerAttack() const { return ShotsPerAttack; }
+
 	USoundBase* GetSound() const { return FireSound; }
+
 	UAnimMontage* GetAnimation() const { return FireAnimation; }
-protected:
+
+
+private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-		float Range{ 2500.f };
+	float Range{2500.f};
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-		float Damage{ 50.f };
+	float Damage{50.f};
 	// Total amount of ammo.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-		int Ammo{ 100 };
+	int Ammo{100};
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-		int AmmoPerClip{ 10 };
+	int AmmoPerClip{10};
 	// Time between each shot.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-		float Cooldown{ 0.2f };
+	float Cooldown{0.2f};
 	// How much force each bullet will impart on hitting a target.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-		float ShotForce{ 4000.f };
+	float ShotForce{4000.f};
 	// How many shots a gun should fire per attack - A shotgun might have 5-10 pellets in one shot for instance.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-		int ShotsPerAttack{ 1 };
+	int ShotsPerAttack{1};
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-		USoundBase* FireSound;
+	USoundBase* FireSound;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-		UAnimMontage* FireAnimation;
+	UAnimMontage* FireAnimation;
 };

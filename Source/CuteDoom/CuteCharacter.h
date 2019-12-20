@@ -29,6 +29,7 @@ public:
 
 	/** Returns Mesh1P subobject **/
 	FORCEINLINE class USkeletalMeshComponent* GetArmsMesh() const { return ArmsMesh; }
+
 	/** Returns FirstPersonCameraComponent subobject **/
 	FORCEINLINE class UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
 
@@ -59,7 +60,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Meat)
 	float MeatsEaten{100};
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Debug)
-	bool DebugMode{false};
+	bool bDebugMode{false};
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 	float BaseTurnRate;
@@ -71,6 +72,10 @@ public:
 	/** Gun muzzle's offset from the characters location */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
 	FVector GunOffset;
+	UPROPERTY(BlueprintReadOnly)
+	UWeaponStats* CurWeapon{nullptr};
+	UPROPERTY(BlueprintReadOnly)
+	UWeaponStats* KickWeapon{nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
 	TSubclassOf<UWeaponStats> PistolBP;
@@ -86,10 +91,10 @@ protected:
 	bool DoTrace(FHitResult* RV_Hit, FCollisionQueryParams* RV_TraceParams, float TraceRange);
 
 	/** Handles moving forward/backward */
-	void MoveForward(float Val);
+	void MoveForward(float Value);
 
 	/** Handles strafing movement, left and right */
-	void MoveRight(float Val);
+	void MoveRight(float Value);
 
 	/**
 	 * Called via input to turn at a given rate.
@@ -108,11 +113,9 @@ protected:
 private:
 	/** Pawn mesh: 1st person view (arms; seen only by self) */
 	UPROPERTY(EditDefaultsOnly, Category = Mesh)
-
 	class USkeletalMeshComponent* ArmsMesh;
 	/** Gun mesh: 1st person view (seen only by self) */
 	UPROPERTY(EditDefaultsOnly, Category = Mesh)
-
 	class USkeletalMeshComponent* FPGun;
 
 	/** First person camera */
@@ -123,10 +126,7 @@ private:
 
 	class UCameraComponent* FirstPersonCameraComponent;
 
-	UPROPERTY()
-	UWeaponStats* CurWeapon{nullptr};
-	UPROPERTY()
-	UWeaponStats* KickWeapon{nullptr};
+
 public:
 	// Called every frame
 	void Tick(float DeltaTime) override;

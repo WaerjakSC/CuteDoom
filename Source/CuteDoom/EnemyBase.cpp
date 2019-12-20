@@ -34,29 +34,21 @@ AEnemyBase::AEnemyBase()
 }
 
 // Called when the game starts or when spawned
-void AEnemyBase::BeginPlay()
-{
-	Super::BeginPlay();
-
-}
+void AEnemyBase::BeginPlay() { Super::BeginPlay(); }
 
 // Called every frame
-void AEnemyBase::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
+void AEnemyBase::Tick(float DeltaTime) { Super::Tick(DeltaTime); }
 
 // Called to bind functionality to input
 void AEnemyBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
 }
 
-void AEnemyBase::HitEvent(float Damage, float ForceScaling)
+void AEnemyBase::HitEvent(const float Damage, const float ForceScaling)
 {
-	if (Health > 0) {
+	if (Health > 0)
+	{
 		Health -= Damage;
 		BloodGush->ActivateSystem();
 	}
@@ -65,7 +57,6 @@ void AEnemyBase::HitEvent(float Damage, float ForceScaling)
 		Gibs->ActivateSystem();
 		EnemyMesh->DestroyComponent();
 		DestroyFace();
-
 	}
 	if (Health <= 0.f && !bIsDead)
 	{
@@ -73,7 +64,8 @@ void AEnemyBase::HitEvent(float Damage, float ForceScaling)
 		// Disable all collision on capsule
 		//collider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		//collider->SetCollisionResponseToAllChannels(ECR_Ignore);
-		if (!bIsRagdoll) {
+		if (!bIsRagdoll)
+		{
 			Collider->DestroyComponent();
 			EnemyMesh->SetAllBodiesSimulatePhysics(true); // Start simulating physics to active ragdoll mode.
 			EnemyMesh->SetSimulatePhysics(true);
@@ -86,35 +78,34 @@ void AEnemyBase::HitEvent(float Damage, float ForceScaling)
 
 			bIsRagdoll = true;
 			EnemyMesh->SetAllPhysicsLinearVelocity(FVector(0));
-
 		}
 
 
 		// Apply force from the attack.
-		FVector lineFromPlayer = -GetActorRightVector();
-		lineFromPlayer *= ForceScaling;
-		lineFromPlayer.Z *= 1.4f; // Add some extra force in the Z direction to simulate the "flying backwards and up" trope in movies when people get shot
-		EnemyMesh->AddImpulse(lineFromPlayer); // Head is still too heavy so this kinda doesn't work too well atm
+		FVector LineFromPlayer = -GetActorRightVector();
+		LineFromPlayer *= ForceScaling;
+		LineFromPlayer.Z *= 1.4f;
+		// Add some extra force in the Z direction to simulate the "flying backwards and up" trope in movies when people get shot
+		EnemyMesh->AddImpulse(LineFromPlayer); // Head is still too heavy so this kinda doesn't work too well atm
 		SpawnMeat();
 	}
 }
+
 void AEnemyBase::SpawnMeat()
 {
 	if (Meat)
 	{
-		UWorld* world = GetWorld();
-		if (world)
+		if (GetWorld())
 		{
-			FActorSpawnParameters spawnParams;
-			spawnParams.Owner = this;
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.Owner = this;
 
-			FRotator rotator;
+			const FRotator Rotation;
 
-			FVector spawnLocation = this->EnemyMesh->GetComponentLocation();
-			FVector increaseZ(0, 0, 2);
-			spawnLocation = spawnLocation + increaseZ;
-			world->SpawnActor<AActor>(Meat, spawnLocation, rotator, spawnParams);
+			FVector SpawnLocation = this->EnemyMesh->GetComponentLocation();
+			const FVector IncreaseZ(0, 0, 2);
+			SpawnLocation = SpawnLocation + IncreaseZ;
+			GetWorld()->SpawnActor<AActor>(Meat, SpawnLocation, Rotation, SpawnParams);
 		}
 	}
-
 }

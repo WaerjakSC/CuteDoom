@@ -10,6 +10,9 @@
 #include "InteractActor.h"
 #include "Engine/Engine.h"
 #include "Engine/World.h"
+#include "Kismet/GameplayStatics.h"
+#include "EnemyBase.h"
+
 // Sets default values
 ACuteCharacter::ACuteCharacter()
 {
@@ -67,10 +70,7 @@ void ACuteCharacter::BeginPlay()
 }
 
 // Called every frame
-void ACuteCharacter::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-}
+void ACuteCharacter::Tick(float DeltaTime) { Super::Tick(DeltaTime); }
 
 // Called to bind functionality to input
 void ACuteCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -114,7 +114,7 @@ void ACuteCharacter::Shoot()
 		AActor* DamagedActor = TraceResult.GetActor();
 
 		UPrimitiveComponent* DamagedComponent = TraceResult.GetComponent();
-		if (DebugMode)
+		if (bDebugMode)
 		{
 			GEngine->AddOnScreenDebugMessage(
 				-1,
@@ -127,10 +127,15 @@ void ACuteCharacter::Shoot()
 		if ((DamagedActor != nullptr) && (DamagedActor != this) &&
 			(DamagedComponent != nullptr))
 		{
-			// NOTE: Get equipped gun -> damage here
-			// if (AEnemyBase* enemy = Cast<AEnemyBase>(DamagedActor))
+			FVector HitDirection{GetActorLocation() - DamagedActor->GetActorLocation()};
+			// Untested but should function the same as the blueprint version. Might want to add a DamageTypeClass for the last parameter
+			UGameplayStatics::ApplyPointDamage(DamagedActor, CurWeapon->GetDamage(), HitDirection,
+			                                   TraceResult, GetController(), this, nullptr);
 			// with a component that is simulating physics, apply an impulse
-			//  enemy->hitEvent(50.f, 40000.f);
+			if (AEnemyBase* Enemy = Cast<AEnemyBase>(DamagedActor))
+			{
+				Enemy->HitEvent(CurWeapon->GetDamage(), CurWeapon->GetForce());
+			}
 		}
 	}
 }
@@ -146,7 +151,7 @@ void ACuteCharacter::Kick()
 		AActor* DamagedActor = TraceResult.GetActor();
 
 		UPrimitiveComponent* DamagedComponent = TraceResult.GetComponent();
-		if (DebugMode)
+		if (bDebugMode)
 		{
 			GEngine->AddOnScreenDebugMessage(
 				-1,
@@ -159,24 +164,30 @@ void ACuteCharacter::Kick()
 		if ((DamagedActor != nullptr) && (DamagedActor != this) &&
 			(DamagedComponent != nullptr))
 		{
+			auto HitDirection{GetActorLocation() - DamagedActor->GetActorLocation()};
+			// Untested but should function the same as the blueprint version. 
+			UGameplayStatics::ApplyPointDamage(DamagedActor, KickWeapon->GetDamage(), HitDirection,
+			                                   TraceResult, GetController(), this, nullptr);
 			// with a component that is simulating physics, apply an impulse
-			// if (AEnemyBase* enemy = Cast<AEnemyBase>(DamagedActor))
-			//  enemy->hitEvent(50.f, 40000.f);
+			if (AEnemyBase* Enemy = Cast<AEnemyBase>(DamagedActor))
+			{
+				Enemy->HitEvent(KickWeapon->GetDamage(), KickWeapon->GetForce());
+			}
 		}
 	}
 }
 
 void ACuteCharacter::Interact()
 {
-	TArray<AActor*> overlappingActors;
-	GetOverlappingActors(overlappingActors);
-	for (auto actor : overlappingActors)
+	TArray<AActor*> OverlappingActors;
+	GetOverlappingActors(OverlappingActors);
+	for (auto Actor : OverlappingActors)
 	{
-		if (actor->Implements<UInteractable>())
+		if (Actor->Implements<UInteractable>())
 		{
 			// Check if the actor implements our Interactable interface
 			// It does, so we execute the activate function. This may be a different function based on the actor.
-			IInteractable::Execute_Activate(actor);
+			IInteractable::Execute_Activate(Actor);
 			// Actor should always be the first variable, after which you can add any extra parameters the function asks for.
 		}
 	}
@@ -212,7 +223,7 @@ bool ACuteCharacter::DoTrace(FHitResult* RV_Hit,
 	GetActorEyesViewPoint(CameraLoc, CameraRot);
 
 	FVector Start = CameraLoc;
-	FVector End = CameraLoc + (CameraRot.Vector() * TraceRange);
+	const FVector End = CameraLoc + (CameraRot.Vector() * TraceRange);
 
 	RV_TraceParams->bTraceComplex = true;
 	RV_TraceParams->bReturnPhysicalMaterial = true;
@@ -234,10 +245,7 @@ bool ACuteCharacter::DoTrace(FHitResult* RV_Hit,
 			*RV_TraceParams);
 	}
 	Start.Z -= 40.f; // Start the debug line slightly behind the camera
-	if (DebugMode)
-	{
-		DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 1.f);
-	}
+	if (bDebugMode) { DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 1.f); }
 	return DidTrace;
 }
 
