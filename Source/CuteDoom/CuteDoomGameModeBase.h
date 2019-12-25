@@ -9,9 +9,10 @@
 /**
  * 
  */
-UCLASS(Abstract)
+UCLASS()
 class CUTEDOOM_API ACuteDoomGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
-	
+public:
+	ACuteDoomGameModeBase();
 };

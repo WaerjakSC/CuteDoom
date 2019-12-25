@@ -4,6 +4,7 @@
 #include "EnemyBase.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Weapon.h"
 #include "Components/CapsuleComponent.h"
 
 // Sets default values
@@ -45,7 +46,7 @@ void AEnemyBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
-void AEnemyBase::HitEvent(const float Damage, const float ForceScaling)
+void AEnemyBase::HitEvent(const FVector AttackPosition, const float Damage, const float ForceScaling)
 {
 	if (Health > 0)
 	{
@@ -56,7 +57,6 @@ void AEnemyBase::HitEvent(const float Damage, const float ForceScaling)
 	{
 		Gibs->ActivateSystem();
 		EnemyMesh->DestroyComponent();
-		DestroyFace();
 	}
 	if (Health <= 0.f && !bIsDead)
 	{
@@ -82,13 +82,18 @@ void AEnemyBase::HitEvent(const float Damage, const float ForceScaling)
 
 
 		// Apply force from the attack.
-		FVector LineFromPlayer = -GetActorRightVector();
+		FVector LineFromPlayer = GetActorForwardVector() - AttackPosition;
 		LineFromPlayer *= ForceScaling;
 		LineFromPlayer.Z *= 1.4f;
 		// Add some extra force in the Z direction to simulate the "flying backwards and up" trope in movies when people get shot
 		EnemyMesh->AddImpulse(LineFromPlayer); // Head is still too heavy so this kinda doesn't work too well atm
 		SpawnMeat();
 	}
+}
+
+void AEnemyBase::HitEvent(const FVector AttackPosition, const UWeapon* Weapon)
+{
+	HitEvent(AttackPosition, Weapon->GetDamage(), Weapon->GetForce());
 }
 
 void AEnemyBase::SpawnMeat()

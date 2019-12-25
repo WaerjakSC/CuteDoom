@@ -7,6 +7,7 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "EnemyBase.generated.h"
 
+class UWeapon;
 UCLASS()
 class CUTEDOOM_API AEnemyBase : public ACharacter
 {
@@ -33,11 +34,13 @@ public:
 	UParticleSystemComponent* BloodGush;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UParticleSystemComponent* Gibs;
-	void HitEvent(float Damage, float ForceScaling);
+	/** Called by external actors when they want to apply damage and/or force. */
+	void HitEvent(const FVector AttackPosition, const float Damage, const float ForceScaling);
+	/** Alternate function taking a weapon type instead. */
+	void HitEvent(const FVector AttackPosition, const UWeapon* Weapon);
 	UFUNCTION(BlueprintCallable)
 	void SpawnMeat();
-	UFUNCTION(BlueprintImplementableEvent)
-	void DestroyFace();
+
 protected:
 	// Called when the game starts or when spawned
 	void BeginPlay() override;

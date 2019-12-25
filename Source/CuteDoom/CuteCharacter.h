@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "WeaponStats.h"
+#include "Weapon.h"
 #include "CuteCharacter.generated.h"
 
 /*
@@ -73,22 +73,22 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
 	FVector GunOffset;
 	UPROPERTY(BlueprintReadOnly)
-	UWeaponStats* CurWeapon{nullptr};
+	UWeapon* CurWeapon{nullptr};
 	UPROPERTY(BlueprintReadOnly)
-	UWeaponStats* KickWeapon{nullptr};
+	UWeapon* KickWeapon{nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
-	TSubclassOf<UWeaponStats> PistolBP;
+	TSubclassOf<UWeapon> PistolBP;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
-	TSubclassOf<UWeaponStats> ShotgunBP;
+	TSubclassOf<UWeapon> ShotgunBP;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
-	TSubclassOf<UWeaponStats> KickBP;
+	TSubclassOf<UWeapon> KickBP;
 
 protected:
 	// Called when the game starts or when spawned
 	void BeginPlay() override;
 
-	bool DoTrace(FHitResult* RV_Hit, FCollisionQueryParams* RV_TraceParams, float TraceRange);
+	bool DoTrace(FHitResult& RV_Hit, FCollisionQueryParams& RV_TraceParams, const FVector TraceEnd) const;
 
 	/** Handles moving forward/backward */
 	void MoveForward(float Value);
@@ -126,6 +126,11 @@ private:
 
 	class UCameraComponent* FirstPersonCameraComponent;
 
+	UPROPERTY()
+	UWeapon* Pistol;
+	UPROPERTY()
+	UWeapon* Shotgun;
+
 
 public:
 	// Called every frame
@@ -134,4 +139,5 @@ public:
 	// Called to bind functionality to input
 	void SetupPlayerInputComponent(
 		class UInputComponent* PlayerInputComponent) override;
+	void Attack(const UWeapon* Weapon);
 };

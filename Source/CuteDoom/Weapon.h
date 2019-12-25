@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
-#include "WeaponStats.generated.h"
+#include "Weapon.generated.h"
 
 class USoundBase;
 class UAnimMontage;
@@ -12,7 +12,7 @@ class UAnimMontage;
  *
  */
 UCLASS(Blueprintable)
-class CUTEDOOM_API UWeaponStats : public UObject
+class CUTEDOOM_API UWeapon : public UObject
 {
 	GENERATED_BODY()
 public:
@@ -29,7 +29,7 @@ public:
 
 	float GetCooldown() const { return Cooldown; }
 
-	int GetShotsPerAttack() const { return ShotsPerAttack; }
+	int GetHitsPerAttack() const { return HitsPerAttack; }
 
 	USoundBase* GetSound() const { return FireSound; }
 
@@ -54,7 +54,7 @@ private:
 	float ShotForce{4000.f};
 	// How many shots a gun should fire per attack - A shotgun might have 5-10 pellets in one shot for instance.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	int ShotsPerAttack{1};
+	int HitsPerAttack{1};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	USoundBase* FireSound;
