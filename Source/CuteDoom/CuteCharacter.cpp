@@ -235,6 +235,11 @@ void ACuteCharacter::Interact()
 float ACuteCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
 	AActor* DamageCauser)
 {
+	Health -= DamageAmount;
+	if(Health <= 0)
+	{
+		// Do something here.
+	}
 	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 }
 

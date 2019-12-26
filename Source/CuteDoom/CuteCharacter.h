@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Weapon.h"
+#include "Saveable.h"
 #include "CuteCharacter.generated.h"
 
 /*
@@ -19,7 +20,7 @@ enum class ESelectedWeapon : uint8
 };
 
 UCLASS()
-class CUTEDOOM_API ACuteCharacter : public ACharacter
+class CUTEDOOM_API ACuteCharacter : public ACharacter, public ISaveable
 {
 	GENERATED_BODY()
 
@@ -48,9 +49,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetWeapon(ESelectedWeapon NewWeapon);
 	// Character health.
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PlayerCharacter)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, SaveGame, Category = PlayerCharacter)
 	float MaxHealth{100.f};
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PlayerCharacter)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, SaveGame, Category = PlayerCharacter)
 	float Health{100.f};
 
 	/**
@@ -61,12 +62,12 @@ public:
 	float RestoreHealth(float AmountRestored);
 
 	// Total boost from eating meat.
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Meat)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, SaveGame, Category = Meat)
 	float MeatBoost{0.f}; // Number of meat pieces to next boost.
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Meat)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, SaveGame, Category = Meat)
 	int ToNextBoost{10};
 	// Total amount of meat pieces eaten.
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Meat)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, SaveGame, Category = Meat)
 	float MeatsEaten{100};
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Debug)
 	bool bDebugMode{false};
@@ -76,14 +77,14 @@ public:
 	/** Base look up/down rate, in deg/sec. Other scaling may affect final rate.   */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 	float BaseLookUpRate;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, SaveGame, Category = Weapon)
 	ESelectedWeapon CurrentWeapon{ESelectedWeapon::Pistol};
 	/** Gun muzzle's offset from the characters location */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
 	FVector GunOffset;
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, SaveGame)
 	UWeapon* CurWeapon{nullptr};
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, SaveGame)
 	UWeapon* KickWeapon{nullptr};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
@@ -135,9 +136,9 @@ private:
 
 	class UCameraComponent* FirstPersonCameraComponent;
 
-	UPROPERTY()
+	UPROPERTY(SaveGame)
 	UWeapon* Pistol;
-	UPROPERTY()
+	UPROPERTY(SaveGame)
 	UWeapon* Shotgun;
 
 
