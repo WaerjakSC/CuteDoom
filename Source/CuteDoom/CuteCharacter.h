@@ -36,21 +36,30 @@ public:
 	/** Fires a projectile. */
 	void Shoot();
 
+	void Reload();
 	/** Kick event */
 	void Kick();
 
 	/** Interaction event */
 	void Interact();
 
-	float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+	float TakeDamage(float DamageAmount, const FDamageEvent& DamageEvent, AController* EventInstigator,
+	                 AActor* DamageCauser) override;
 	UFUNCTION(BlueprintCallable)
 	void SetWeapon(ESelectedWeapon NewWeapon);
 	// Character health.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PlayerCharacter)
-	float MaxHealth{100};
-
+	float MaxHealth{100.f};
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PlayerCharacter)
-	float Health{100};
+	float Health{100.f};
+
+	/**
+	 * Restore health to the player.
+	 * @return The amount of health after healing.
+	 */
+	UFUNCTION(BlueprintCallable)
+	float RestoreHealth(float AmountRestored);
+
 	// Total boost from eating meat.
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Meat)
 	float MeatBoost{0.f}; // Number of meat pieces to next boost.
@@ -139,5 +148,5 @@ public:
 	// Called to bind functionality to input
 	void SetupPlayerInputComponent(
 		class UInputComponent* PlayerInputComponent) override;
-	void Attack(const UWeapon* Weapon);
+	void Attack(UWeapon* Weapon);
 };

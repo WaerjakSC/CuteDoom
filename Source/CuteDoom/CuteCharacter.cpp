@@ -73,6 +73,8 @@ void ACuteCharacter::BeginPlay()
 	SetWeapon(CurrentWeapon);
 }
 
+
+
 // Called every frame
 void ACuteCharacter::Tick(float DeltaTime)
 {
@@ -97,6 +99,8 @@ void ACuteCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	// Bind interact event
 	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &ACuteCharacter::Interact);
 
+	PlayerInputComponent->BindAction("Reload", IE_Pressed, this, &ACuteCharacter::Reload);
+
 	// Bind movement events
 	PlayerInputComponent->BindAxis("MoveForward", this, &ACuteCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &ACuteCharacter::MoveRight);
@@ -115,13 +119,23 @@ void ACuteCharacter::Shoot()
 	Attack(CurWeapon);
 }
 
+void ACuteCharacter::Reload()
+{
+	CurWeapon->Reload();
+}
+
 void ACuteCharacter::Kick()
 {
 	Attack(KickWeapon);
 }
 
-void ACuteCharacter::Attack(const UWeapon* Weapon)
+void ACuteCharacter::Attack(UWeapon* Weapon)
 {
+	if(Weapon->GetAmmo() == 0)
+	{
+		// Could add something here like playing an "Empty Gun" animation or something.
+		return;
+	}
 	FHitResult TraceResult(ForceInit);
 	FCollisionQueryParams RV_TraceParams =
 		FCollisionQueryParams(FName(TEXT("RV_Trace")), true, this);
@@ -163,6 +177,7 @@ void ACuteCharacter::Attack(const UWeapon* Weapon)
 			}
 		}
 	}
+	Weapon->UseAmmo(); // Deplete ammo by one
 }
 
 
@@ -238,6 +253,13 @@ void ACuteCharacter::SetWeapon(const ESelectedWeapon NewWeapon)
 	default:
 		break;
 	}
+}
+
+float ACuteCharacter::RestoreHealth(const float AmountRestored)
+{
+	const float HealthToFull{MaxHealth - Health};
+	Health += (HealthToFull > AmountRestored) ? AmountRestored : HealthToFull;
+	return Health;
 }
 
 void ACuteCharacter::MoveForward(float Value)

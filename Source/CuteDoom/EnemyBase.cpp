@@ -55,6 +55,12 @@ void AEnemyBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 
 void AEnemyBase::HitEvent(APawn* Actor, FPointDamageEvent& DamageEvent, const UWeapon* Weapon)
 {
+	if (bIsDead) // shoot as many times as you like to spawn as many gibs as you like I guess, should be funny
+	{
+		Gibs->ActivateSystem();
+		EnemyMesh->DestroyComponent();
+		return;
+	}
 	if (Health > 0)
 	{
 		Health -= TakeDamage(Weapon->GetDamage(), DamageEvent, Actor->GetController(), Actor);
@@ -63,47 +69,73 @@ void AEnemyBase::HitEvent(APawn* Actor, FPointDamageEvent& DamageEvent, const UW
 		BloodGush->SetRelativeRotation(RotateToAttacker);
 		BloodGush->ActivateSystem();
 	}
-	if (bIsDead) // shoot as many times as you like to spawn as many gibs as you like I guess, should be funny
-	{
-		Gibs->ActivateSystem();
-		EnemyMesh->DestroyComponent();
-	}
-	if (Health <= 0.f && !bIsDead)
+	if (Health <= 0.f)
 	{
 		bIsDead = true;
-		// Disable all collision on capsule
-		//collider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		//collider->SetCollisionResponseToAllChannels(ECR_Ignore);
+		/* Disable all collision on capsule */
+		Collider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		Collider->SetCollisionResponseToAllChannels(ECR_Ignore);
 		if (!bIsRagdoll)
 		{
-			Collider->DestroyComponent();
-			EnemyMesh->SetAllBodiesSimulatePhysics(true); // Start simulating physics to active ragdoll mode.
-			EnemyMesh->SetSimulatePhysics(true);
-			EnemyMesh->WakeAllRigidBodies();
-			EnemyMesh->bBlendPhysics = true;
-
-			Movement->StopMovementImmediately();
-			Movement->DisableMovement();
-			Movement->SetComponentTickEnabled(false);
-
-			bIsRagdoll = true;
-			EnemyMesh->SetAllPhysicsLinearVelocity(FVector(0));
+			if(EnemyMesh)
+			{
+				EnemyMesh->SetCollisionProfileName(TEXT("Ragdoll"));
+			}
+			SetActorEnableCollision(true); // Collider is disabled, so we enable it for the whole actor instead.
+			SetRagdollPhysics();
 		}
 
 
 		// Apply force from the attack.
-
-		FVector HitDirection{DamageEvent.ShotDirection};
-		HitDirection *= Weapon->GetForce();
-		HitDirection.Z *= 1.4f;
+		const FVector HitDirection{DamageEvent.ShotDirection * Weapon->GetForce()};
+		// HitDirection.Z *= 1.4f;
 		// Add some extra force in the Z direction to simulate the "flying backwards and up" trope in movies when people get shot
-		EnemyMesh->AddImpulse(HitDirection); // Head is still too heavy so this kinda doesn't work too well atm
+		EnemyMesh->AddImpulse(HitDirection);
 
 
 		SpawnMeat();
 	}
 }
 
+void AEnemyBase::SetRagdollPhysics()
+{
+	if (IsPendingKill())
+	{
+		bIsRagdoll = false;
+	}
+	else if (!EnemyMesh || !EnemyMesh->GetPhysicsAsset())
+	{
+		bIsRagdoll = false;
+	}
+	else
+	{
+		EnemyMesh->SetAllBodiesSimulatePhysics(true);
+		EnemyMesh->SetSimulatePhysics(true);
+		EnemyMesh->WakeAllRigidBodies();
+		EnemyMesh->bBlendPhysics = true;
+
+		bIsRagdoll = true;
+	}
+
+	UCharacterMovementComponent* CharacterComp = Cast<UCharacterMovementComponent>(GetMovementComponent());
+	if (CharacterComp)
+	{
+		CharacterComp->StopMovementImmediately();
+		CharacterComp->DisableMovement();
+		CharacterComp->SetComponentTickEnabled(false);
+	}
+	if (!bIsRagdoll)
+	{
+		// Immediately hide the pawn
+		TurnOff();
+		SetActorHiddenInGame(true);
+		SetLifeSpan(1.0f);
+	}
+	else
+	{
+		SetLifeSpan(10.0f);
+	}
+}
 
 void AEnemyBase::SpawnMeat()
 {

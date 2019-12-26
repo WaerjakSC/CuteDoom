@@ -25,6 +25,8 @@ public:
 
 	int GetAmmo() const { return Ammo; }
 
+	int GetSpareAmmo() const { return SpareAmmo; }
+
 	int GetAmmoPerClip() const { return AmmoPerClip; }
 
 	float GetCooldown() const { return Cooldown; }
@@ -35,17 +37,24 @@ public:
 
 	UAnimMontage* GetAnimation() const { return FireAnimation; }
 
+	void UseAmmo();
+
+	void Reload();
 
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	float Range{2500.f};
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	float Damage{50.f};
-	// Total amount of ammo.
+	// Total amount of ammo not in clip.
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
+	int SpareAmmo{50};
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	int Ammo{100};
+	int Ammo{10};
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	int AmmoPerClip{10};
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
+	int MaxAmmo{100};
 	// Time between each shot.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	float Cooldown{0.2f};

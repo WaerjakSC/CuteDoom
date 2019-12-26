@@ -58,4 +58,5 @@ public:
 	void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 private:
 	bool bIsRagdoll{false};
+		void SetRagdollPhysics();
 };
