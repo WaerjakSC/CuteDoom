@@ -126,12 +126,12 @@ void ACuteCharacter::Attack(const UWeapon* Weapon)
 	FCollisionQueryParams RV_TraceParams =
 		FCollisionQueryParams(FName(TEXT("RV_Trace")), true, this);
 	FVector TraceEnd{GetActorForwardVector() * Weapon->GetRange()};
-	const UShotgun* Shotgun{Cast<UShotgun>(Weapon)};
+	const UShotgun* ShotgunWeapon{Cast<UShotgun>(Weapon)};
 	for (int i{0}; i < Weapon->GetHitsPerAttack(); i++)
 	{
-		if (Shotgun)
+		if (ShotgunWeapon)
 		{
-			const float Spread{FMath::FRandRange(-Shotgun->GetSpread(), Shotgun->GetSpread())};
+			const float Spread{FMath::FRandRange(-ShotgunWeapon->GetSpread(), ShotgunWeapon->GetSpread())};
 			TraceEnd = TraceEnd.RotateAngleAxis(Spread, GetActorUpVector());
 		}
 		if (DoTrace(TraceResult, RV_TraceParams, TraceEnd))
@@ -157,10 +157,8 @@ void ACuteCharacter::Attack(const UWeapon* Weapon)
 				// with a component that is simulating physics, apply an impulse
 				if (AEnemyBase* Enemy = Cast<AEnemyBase>(DamagedActor))
 				{
-					Enemy->HitEvent(GetActorLocation(), Weapon);
-					// Untested but should function the same as the blueprint version. Might want to add a DamageTypeClass for the last parameter
-					UGameplayStatics::ApplyPointDamage(DamagedActor, Weapon->GetDamage(), HitDirection,
-					                                   TraceResult, GetController(), this, nullptr);
+					FPointDamageEvent DamageEvent{Weapon->GetDamage(), TraceResult, HitDirection, nullptr};
+					Enemy->HitEvent(this, DamageEvent, Weapon);
 				}
 			}
 		}
@@ -217,6 +215,12 @@ void ACuteCharacter::Interact()
 			// Actor should always be the first variable, after which you can add any extra parameters the function asks for.
 		}
 	}
+}
+
+float ACuteCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
+	AActor* DamageCauser)
+{
+	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 }
 
 

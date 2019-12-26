@@ -35,9 +35,8 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UParticleSystemComponent* Gibs;
 	/** Called by external actors when they want to apply damage and/or force. */
-	void HitEvent(const FVector AttackPosition, const float Damage, const float ForceScaling);
-	/** Alternate function taking a weapon type instead. */
-	void HitEvent(const FVector AttackPosition, const UWeapon* Weapon);
+	void HitEvent(APawn* Actor, FPointDamageEvent& DamageEvent, const UWeapon* Weapon);
+
 	UFUNCTION(BlueprintCallable)
 	void SpawnMeat();
 
@@ -50,6 +49,7 @@ protected:
 	class UCapsuleComponent* Collider;
 	UPROPERTY(VisibleAnywhere)
 	class UCharacterMovementComponent* Movement;
+
 public:
 	// Called every frame
 	void Tick(float DeltaTime) override;

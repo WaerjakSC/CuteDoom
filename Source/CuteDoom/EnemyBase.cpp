@@ -35,10 +35,17 @@ AEnemyBase::AEnemyBase()
 }
 
 // Called when the game starts or when spawned
-void AEnemyBase::BeginPlay() { Super::BeginPlay(); }
+void AEnemyBase::BeginPlay()
+{
+	Super::BeginPlay();
+}
 
 // Called every frame
-void AEnemyBase::Tick(float DeltaTime) { Super::Tick(DeltaTime); }
+void AEnemyBase::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+}
+
 
 // Called to bind functionality to input
 void AEnemyBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -46,11 +53,14 @@ void AEnemyBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
-void AEnemyBase::HitEvent(const FVector AttackPosition, const float Damage, const float ForceScaling)
+void AEnemyBase::HitEvent(APawn* Actor, FPointDamageEvent& DamageEvent, const UWeapon* Weapon)
 {
 	if (Health > 0)
 	{
-		Health -= Damage;
+		Health -= TakeDamage(Weapon->GetDamage(), DamageEvent, Actor->GetController(), Actor);
+		// From the ShotDirection, determine which rotation the blood spurt should have.
+		const FRotator RotateToAttacker{DamageEvent.ShotDirection.ToOrientationRotator()};
+		BloodGush->SetRelativeRotation(RotateToAttacker);
 		BloodGush->ActivateSystem();
 	}
 	if (bIsDead) // shoot as many times as you like to spawn as many gibs as you like I guess, should be funny
@@ -82,19 +92,18 @@ void AEnemyBase::HitEvent(const FVector AttackPosition, const float Damage, cons
 
 
 		// Apply force from the attack.
-		FVector LineFromPlayer = GetActorForwardVector() - AttackPosition;
-		LineFromPlayer *= ForceScaling;
-		LineFromPlayer.Z *= 1.4f;
+
+		FVector HitDirection{DamageEvent.ShotDirection};
+		HitDirection *= Weapon->GetForce();
+		HitDirection.Z *= 1.4f;
 		// Add some extra force in the Z direction to simulate the "flying backwards and up" trope in movies when people get shot
-		EnemyMesh->AddImpulse(LineFromPlayer); // Head is still too heavy so this kinda doesn't work too well atm
+		EnemyMesh->AddImpulse(HitDirection); // Head is still too heavy so this kinda doesn't work too well atm
+
+
 		SpawnMeat();
 	}
 }
 
-void AEnemyBase::HitEvent(const FVector AttackPosition, const UWeapon* Weapon)
-{
-	HitEvent(AttackPosition, Weapon->GetDamage(), Weapon->GetForce());
-}
 
 void AEnemyBase::SpawnMeat()
 {

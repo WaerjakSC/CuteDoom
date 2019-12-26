@@ -42,8 +42,8 @@ public:
 	/** Interaction event */
 	void Interact();
 
+	float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 	UFUNCTION(BlueprintCallable)
-
 	void SetWeapon(ESelectedWeapon NewWeapon);
 	// Character health.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PlayerCharacter)
@@ -88,7 +88,7 @@ protected:
 	// Called when the game starts or when spawned
 	void BeginPlay() override;
 
-	bool DoTrace(FHitResult& RV_Hit, FCollisionQueryParams& RV_TraceParams, const FVector TraceEnd) const;
+	bool DoTrace(FHitResult& RV_Hit, FCollisionQueryParams& RV_TraceParams, FVector TraceEnd) const;
 
 	/** Handles moving forward/backward */
 	void MoveForward(float Value);
