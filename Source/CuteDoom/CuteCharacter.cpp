@@ -153,13 +153,14 @@ void ACuteCharacter::Attack(const UWeapon* Weapon)
 				(DamagedComponent != nullptr))
 			{
 				FVector HitDirection{GetActorLocation() - DamagedActor->GetActorLocation()};
-				// Untested but should function the same as the blueprint version. Might want to add a DamageTypeClass for the last parameter
-				UGameplayStatics::ApplyPointDamage(DamagedActor, Weapon->GetDamage(), HitDirection,
-				                                   TraceResult, GetController(), this, nullptr);
+
 				// with a component that is simulating physics, apply an impulse
 				if (AEnemyBase* Enemy = Cast<AEnemyBase>(DamagedActor))
 				{
 					Enemy->HitEvent(GetActorLocation(), Weapon);
+					// Untested but should function the same as the blueprint version. Might want to add a DamageTypeClass for the last parameter
+					UGameplayStatics::ApplyPointDamage(DamagedActor, Weapon->GetDamage(), HitDirection,
+					                                   TraceResult, GetController(), this, nullptr);
 				}
 			}
 		}
