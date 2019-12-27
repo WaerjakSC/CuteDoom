@@ -47,7 +47,7 @@ public:
 	UCuteSaveGame(const FObjectInitializer& ObjectInitializer);
 
 	UPROPERTY(VisibleAnywhere, Category = Basic)
-	FString SaveSlotName;
+	FString SaveSlotName{TEXT("New Save")};
 
 	UPROPERTY(VisibleAnywhere, Category = Basic)
 	uint32 UserIndex{0};
