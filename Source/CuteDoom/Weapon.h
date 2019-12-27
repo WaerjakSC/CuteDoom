@@ -36,9 +36,13 @@ public:
 	USoundBase* GetSound() const { return FireSound; }
 
 	UAnimMontage* GetAnimation() const { return FireAnimation; }
-
+	/**
+	 * @brief Depletes ammo if there's any left in the clip, otherwise does nothing.
+	 */
 	void UseAmmo();
-
+	/**
+	 * @brief Reloads the clip with as much as is needed to fill it to capacity. Assumes no loss of ammo from reloading a non-empty clip.
+	 */
 	void Reload();
 
 private:

@@ -55,7 +55,7 @@ void AEnemyBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 
 void AEnemyBase::HitEvent(APawn* Actor, FPointDamageEvent& DamageEvent, const UWeapon* Weapon)
 {
-	if (bIsDead) // shoot as many times as you like to spawn as many gibs as you like I guess, should be funny
+	if (bIsDead) // TODO: Better death effects or something.
 	{
 		Gibs->ActivateSystem();
 		EnemyMesh->DestroyComponent();
@@ -81,7 +81,7 @@ void AEnemyBase::HitEvent(APawn* Actor, FPointDamageEvent& DamageEvent, const UW
 			{
 				EnemyMesh->SetCollisionProfileName(TEXT("Ragdoll"));
 			}
-			SetActorEnableCollision(true); // Collider is disabled, so we enable it for the whole actor instead.
+			SetActorEnableCollision(true); // Collider is disabled, so we enable collision for the whole actor instead.
 			SetRagdollPhysics();
 		}
 

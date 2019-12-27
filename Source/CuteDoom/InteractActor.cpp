@@ -24,5 +24,6 @@ void AInteractActor::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 }
-// This should be filled with whatever we want the object to do in-game. A blueprint version can also be made, and you can use one or both at will.
+// TODO: This should be filled with whatever we want the object to do in-game.
+// A blueprint version can also be made, and you can use one or both at will.
 void AInteractActor::Activate_Implementation(){}

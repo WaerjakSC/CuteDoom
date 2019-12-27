@@ -132,7 +132,7 @@ void ACuteCharacter::Attack(UWeapon* Weapon)
 {
 	if (Weapon->GetAmmo() == 0)
 	{
-		// Could add something here like playing an "Empty Gun" animation or something.
+		// TODO: Could add something here like playing an "Empty Gun" animation or something.
 		return;
 	}
 	FHitResult TraceResult(ForceInit);
@@ -176,6 +176,7 @@ void ACuteCharacter::Attack(UWeapon* Weapon)
 			}
 		}
 	}
+	// TODO: Start cooldown timer for attacking, to stop the player from spamming attack and breaking the animation.
 	if (Weapon != KickWeapon) // KickWeapon doesn't use ammo so we don't want to deplete it.
 	{
 		Weapon->UseAmmo(); // Deplete ammo by one
@@ -207,7 +208,7 @@ bool ACuteCharacter::DoTrace(FHitResult& RV_Hit,
 			RV_Hit, // result
 			Start, // start
 			TraceEnd, // end
-			ECC_Pawn, // collision channel -- Set this to something else
+			ECC_Pawn, // TODO: Make custom collision channel or use bit-shifting to get a more generic channel for our use.
 			RV_TraceParams)
 	};
 	if (bDebugMode)
@@ -237,12 +238,13 @@ void ACuteCharacter::Interact()
 float ACuteCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
                                  AActor* DamageCauser)
 {
-	Health -= DamageAmount;
+	const float ActualDamage{Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser)};
+	Health -= ActualDamage;
 	if (Health <= 0)
 	{
-		// Do something here.
+		// TODO: Add death events here.
 	}
-	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	return ActualDamage;
 }
 
 
