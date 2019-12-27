@@ -74,7 +74,6 @@ void ACuteCharacter::BeginPlay()
 }
 
 
-
 // Called every frame
 void ACuteCharacter::Tick(float DeltaTime)
 {
@@ -131,7 +130,7 @@ void ACuteCharacter::Kick()
 
 void ACuteCharacter::Attack(UWeapon* Weapon)
 {
-	if(Weapon->GetAmmo() == 0)
+	if (Weapon->GetAmmo() == 0)
 	{
 		// Could add something here like playing an "Empty Gun" animation or something.
 		return;
@@ -177,14 +176,17 @@ void ACuteCharacter::Attack(UWeapon* Weapon)
 			}
 		}
 	}
-	Weapon->UseAmmo(); // Deplete ammo by one
+	if (Weapon != KickWeapon) // KickWeapon doesn't use ammo so we don't want to deplete it.
+	{
+		Weapon->UseAmmo(); // Deplete ammo by one
+	}
 }
 
 
 bool ACuteCharacter::DoTrace(FHitResult& RV_Hit,
                              FCollisionQueryParams& RV_TraceParams, const FVector TraceEnd) const
 {
-	if (Controller == nullptr) // access the controller, make sure we have one
+	if (Controller) // access the controller, make sure we have one
 	{
 		return false;
 	}
@@ -233,10 +235,10 @@ void ACuteCharacter::Interact()
 }
 
 float ACuteCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
-	AActor* DamageCauser)
+                                 AActor* DamageCauser)
 {
 	Health -= DamageAmount;
-	if(Health <= 0)
+	if (Health <= 0)
 	{
 		// Do something here.
 	}

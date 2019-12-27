@@ -98,6 +98,9 @@ protected:
 	// Called when the game starts or when spawned
 	void BeginPlay() override;
 
+	/**
+	 * @brief Performs a line trace with the given parameters.
+	 */
 	bool DoTrace(FHitResult& RV_Hit, FCollisionQueryParams& RV_TraceParams, FVector TraceEnd) const;
 
 	/** Handles moving forward/backward */
@@ -141,6 +144,10 @@ private:
 	UPROPERTY(SaveGame)
 	UWeapon* Shotgun;
 
+	/**
+	 * @brief Attack implementation. Handles attacking and depletes ammo of the weapon used.
+	 */
+	void Attack(UWeapon* Weapon);
 
 public:
 	// Called every frame
@@ -149,5 +156,4 @@ public:
 	// Called to bind functionality to input
 	void SetupPlayerInputComponent(
 		class UInputComponent* PlayerInputComponent) override;
-	void Attack(UWeapon* Weapon);
 };
